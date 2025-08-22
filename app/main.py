@@ -1,6 +1,7 @@
 import os
-import requests
+import sys
 
+import requests
 
 URL = "https://api.weatherapi.com/v1/current.json"
 CITY = "Paris"
@@ -8,12 +9,23 @@ CITY = "Paris"
 
 def get_weather() -> None:
     api_key = os.environ.get("API_KEY")
-    response = requests.get(
-        f"{URL}?key={api_key}&q={CITY}"
-    )
-    data = response.json()
-    print(f"Location: {data['location']['name']}, {data['location']['country']}")
-    print(f"Temperature: {data['current']['temp_c']}")
+    if not api_key:
+        print("Error: API_KEY environment variable is not set."
+              " Please run with -e API_KEY=...")
+        sys.exit(1)
+    else:
+        response = requests.get(
+            f"{URL}?key={api_key}&q={CITY}"
+        )
+        try:
+            data = response.json()
+            print(
+                f"Location: {data['location']['name']},"
+                f" {data['location']['country']}"
+            )
+            print(f"Temperature: {data['current']['temp_c']}")
+        except requests.exceptions.RequestException as e:
+            print(f"Error: Failed to fetch weather data: {e}")
 
 
 if __name__ == "__main__":
