@@ -14,10 +14,13 @@ def get_weather() -> None:
               " Please run with -e API_KEY=...")
         sys.exit(1)
     else:
-        response = requests.get(
-            f"{URL}?key={api_key}&q={CITY}"
-        )
         try:
+            response = requests.get(
+                URL,
+                params={"key": api_key,
+                        "q": CITY}
+            )
+            response.raise_for_status()
             data = response.json()
             print(
                 f"Location: {data['location']['name']},"
@@ -26,6 +29,7 @@ def get_weather() -> None:
             print(f"Temperature: {data['current']['temp_c']}")
         except requests.exceptions.RequestException as e:
             print(f"Error: Failed to fetch weather data: {e}")
+            sys.exit(1)
 
 
 if __name__ == "__main__":
